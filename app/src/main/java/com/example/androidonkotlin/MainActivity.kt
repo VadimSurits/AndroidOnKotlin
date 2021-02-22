@@ -28,8 +28,14 @@ class MainActivity : AppCompatActivity() {
         }
 
         val testDataClass = TestDataClass("TestDataClass", 2021)
-        button.setOnLongClickListener{
-            textView.setText("${testDataClass.string} ${testDataClass.number}")
+        val testObject = testDataClass.copy("TestDataClassCopy", 3021)
+
+        button.setOnLongClickListener {
+            if (textView.text != "${testDataClass.string} ${testDataClass.number}") {
+                textView.setText("${testDataClass.string} ${testDataClass.number}")
+            } else {
+                textView.setText("${testObject.string} ${testObject.number}")
+            }
             true
         }
     }
