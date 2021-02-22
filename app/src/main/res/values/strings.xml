@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">AndroidOnKotlin</string>
+    <string name="button_text">кнопка</string>
+    <string name="textview_text">Hello World!</string>
+    <string name="textview_kotlin_text">Hello Kotlin!</string>
 </resources>
