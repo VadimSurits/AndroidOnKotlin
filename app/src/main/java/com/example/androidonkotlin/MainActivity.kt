@@ -1,5 +1,6 @@
 package com.example.androidonkotlin
 
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.widget.TextView
@@ -7,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
 
 class MainActivity : AppCompatActivity() {
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -23,6 +25,12 @@ class MainActivity : AppCompatActivity() {
                 textView.setTextColor(Color.BLACK)
                 textView.setBackgroundColor(Color.WHITE)
             }
+        }
+
+        val testDataClass = TestDataClass("TestDataClass", 2021)
+        button.setOnLongClickListener{
+            textView.setText("${testDataClass.string} ${testDataClass.number}")
+            true
         }
     }
 }
