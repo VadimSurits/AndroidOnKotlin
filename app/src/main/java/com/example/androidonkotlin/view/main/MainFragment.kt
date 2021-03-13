@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.androidonkotlin.R
 import com.example.androidonkotlin.databinding.FragmentMainBinding
@@ -20,22 +19,22 @@ class MainFragment : Fragment() {
     private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var viewModel: MainViewModel
-    private val adapter = MainFragmentAdapter(object: OnItemViewClickListener{
+    private val viewModel: MainViewModel by lazy {
+        ViewModelProvider(this).get(MainViewModel::class.java)
+    }
+    private var isDataSetRus: Boolean = true
+    private val adapter = MainFragmentAdapter(object : OnItemViewClickListener {
         override fun onItemViewClick(weather: Weather) {
-            val manager = activity?.supportFragmentManager
-            if(manager != null){
-                val bundle = Bundle()
-                bundle.putParcelable(DetailsFragment.BUNDLE_EXTRA, weather)
-                manager.beginTransaction()
-                        .add(R.id.container, DetailsFragment.newInstance(bundle))
+            activity?.supportFragmentManager?.apply {
+                beginTransaction()
+                        .add(R.id.container, DetailsFragment.newInstance(Bundle().apply {
+                            putParcelable(DetailsFragment.BUNDLE_EXTRA, weather)
+                        }))
                         .addToBackStack("")
                         .commitAllowingStateLoss()
             }
         }
     })
-
-    private var isDataSetRus: Boolean = true
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
@@ -48,7 +47,6 @@ class MainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.mainFragmentRecyclerView.adapter = adapter
         binding.mainFragmentFAB.setOnClickListener { changeWeatherDataSet() }
-        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         viewModel.getLiveData().observe(viewLifecycleOwner, { renderData(it) })
         viewModel.getWeatherFromLocalSourceRus()
     }
@@ -58,16 +56,15 @@ class MainFragment : Fragment() {
         super.onDestroy()
     }
 
-    private fun changeWeatherDataSet() {
-        if (isDataSetRus) {
-            viewModel.getWeatherFromLocalSourceWorld()
-            binding.mainFragmentFAB.setImageResource(R.drawable.ic_earth)
-        } else {
-            viewModel.getWeatherFromLocalSourceRus()
-            binding.mainFragmentFAB.setImageResource(R.drawable.ic_russia)
-        }
-        isDataSetRus = !isDataSetRus
-    }
+    private fun changeWeatherDataSet() =
+            if (isDataSetRus) {
+                viewModel.getWeatherFromLocalSourceWorld()
+                binding.mainFragmentFAB.setImageResource(R.drawable.ic_earth)
+            } else {
+                viewModel.getWeatherFromLocalSourceRus()
+                binding.mainFragmentFAB.setImageResource(R.drawable.ic_russia)
+            }.also { isDataSetRus = !isDataSetRus }
+
 
     private fun renderData(appState: AppState) {
         when (appState) {
@@ -80,12 +77,9 @@ class MainFragment : Fragment() {
             }
             is AppState.Error -> {
                 binding.mainFragmentLoadingLayout.visibility = View.GONE
-                Snackbar.make(binding.mainFragmentFAB, getString(R.string.error),
-                        Snackbar.LENGTH_INDEFINITE)
-                        .setAction(getString(R.string.reload)) {
-                            viewModel.getWeatherFromLocalSourceRus()
-                        }
-                        .show()
+                binding.mainFragmentRootView.showSnackbar(
+                        getString(R.string.error), getString(R.string.reload),
+                        { viewModel.getWeatherFromLocalSourceRus() })
             }
         }
     }
@@ -94,7 +88,15 @@ class MainFragment : Fragment() {
         fun newInstance() = MainFragment()
     }
 
-    interface OnItemViewClickListener{
+    interface OnItemViewClickListener {
         fun onItemViewClick(weather: Weather)
     }
+}
+
+private fun View.showSnackbar(
+        text: String,
+        actionText: String,
+        action: (View) -> Unit,
+        length: Int = Snackbar.LENGTH_INDEFINITE) {
+    Snackbar.make(this, text, length).setAction(actionText, action).show()
 }
