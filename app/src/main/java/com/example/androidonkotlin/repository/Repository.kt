@@ -1,4 +1,6 @@
-package com.example.androidonkotlin.model
+package com.example.androidonkotlin.repository
+
+import com.example.androidonkotlin.model.Weather
 
 interface Repository {
     fun getWeatherFromServer(): Weather
