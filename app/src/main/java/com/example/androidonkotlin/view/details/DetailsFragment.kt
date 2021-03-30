@@ -102,7 +102,7 @@ class DetailsFragment : Fragment() {
         }
     }
 
-    private fun saveCity(city: City, weather: Weather){
+    private fun saveCity(city: City, weather: Weather) {
         viewModel.saveCityToDB(Weather(city, weather.temperature, weather.feelsLike, weather.condition))
     }
 
@@ -150,6 +150,7 @@ class DetailsFragment : Fragment() {
             "Киев" -> chosenHeaderPicture = "https://www.touropia.com/gfx/b/2019/10/" +
                     "ukraine_places-350x200.jpg"
             "Пекин" -> chosenHeaderPicture = "https://img.lovepik.com/element/40038/9227.png_300.png"
+            else -> chosenHeaderPicture = "https://autogear.ru/misc/i/thumb/n/9/5/8/8/3/1/i/958831.jpg"
         }
     }
 
