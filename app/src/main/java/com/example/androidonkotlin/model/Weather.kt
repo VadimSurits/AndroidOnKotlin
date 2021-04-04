@@ -1,8 +1,6 @@
 package com.example.androidonkotlin.model
 
 import android.os.Parcelable
-import android.provider.Settings.System.getString
-import com.example.androidonkotlin.R
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize

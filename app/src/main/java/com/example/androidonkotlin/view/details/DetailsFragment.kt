@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.androidonkotlin.R
 import com.example.androidonkotlin.databinding.FragmentDetailsBinding
+import com.example.androidonkotlin.model.City
 import com.example.androidonkotlin.model.Weather
 import com.example.androidonkotlin.utils.showSnackBar
 import com.example.androidonkotlin.viewmodel.AppState
@@ -49,16 +50,16 @@ class DetailsFragment : Fragment() {
         when (appState) {
             is AppState.Success -> {
                 binding.mainView.visibility = View.VISIBLE
-                binding.loadingLayout.visibility = View.GONE
+                binding.includedLoadingLayout.loadingLayout.visibility = View.GONE
                 setWeather(appState.weatherData[0])
             }
             is AppState.Loading -> {
                 binding.mainView.visibility = View.GONE
-                binding.loadingLayout.visibility = View.VISIBLE
+                binding.includedLoadingLayout.loadingLayout.visibility = View.VISIBLE
             }
             is AppState.Error -> {
                 binding.mainView.visibility = View.VISIBLE
-                binding.loadingLayout.visibility = View.GONE
+                binding.includedLoadingLayout.loadingLayout.visibility = View.GONE
                 binding.mainView.showSnackBar(
                         getString(R.string.error),
                         getString(R.string.reload),
@@ -74,6 +75,7 @@ class DetailsFragment : Fragment() {
     private fun setWeather(weather: Weather) {
         with(binding) {
             val city = weatherBundle.city
+            saveCity(city, weather)
             cityName.text = city.cityName
             cityCoordinates.text = String.format(
                     getString(R.string.city_coordinates),
@@ -98,6 +100,10 @@ class DetailsFragment : Fragment() {
                     .load(chosenHeaderPicture)
                     .into(headerIcon)
         }
+    }
+
+    private fun saveCity(city: City, weather: Weather){
+        viewModel.saveCityToDB(Weather(city, weather.temperature, weather.feelsLike, weather.condition))
     }
 
     private fun getHeaderPicture(cityName: String) {
